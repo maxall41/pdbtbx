@@ -328,20 +328,20 @@ where
                             temp_mtrix.push((ser, matrix, given))
                         }
                     }
-                    LexItem::Crystal(a, b, c, alpha, beta, gamma, spacegroup, _z) => {
-                        pdb.unit_cell = Some(UnitCell::new(a, b, c, alpha, beta, gamma));
-                        pdb.symmetry = if let Some(sym) = Symmetry::new(&spacegroup) {
-                            Some(sym)
-                        } else {
-                            errors.push(PDBError::new(
-                                ErrorLevel::InvalidatingError,
-                                "Invalid space group",
-                                format!("Invalid space group: \"{spacegroup}\""),
-                                line_context.clone(),
-                            ));
-                            None
-                        };
-                    }
+                    // LexItem::Crystal(a, b, c, alpha, beta, gamma, spacegroup, _z) => {
+                    //     pdb.unit_cell = Some(UnitCell::new(a, b, c, alpha, beta, gamma));
+                    //     pdb.symmetry = if let Some(sym) = Symmetry::new(&spacegroup) {
+                    //         Some(sym)
+                    //     } else {
+                    //         errors.push(PDBError::new(
+                    //             ErrorLevel::InvalidatingError,
+                    //             "Invalid space group",
+                    //             format!("Invalid space group: \"{spacegroup}\""),
+                    //             line_context.clone(),
+                    //         ));
+                    //         None
+                    //     };
+                    // }
                     LexItem::Seqres(ser_num, chain_id, num_res, values) => {
                         seqres_start_linenumber = seqres_start_linenumber.min(linenumber);
                         if let Some(data) = sequence.get_mut(&chain_id) {
