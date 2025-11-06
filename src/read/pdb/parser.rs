@@ -101,7 +101,6 @@ where
     let mut sequence: HashMap<String, Vec<(usize, usize, Vec<String>)>> = HashMap::new();
     let mut seqres_lines = Vec::new();
     let mut seqres_start_linenumber = usize::MAX;
-    let mut database_references = Vec::new();
     let mut modifications = Vec::new();
     let mut bonds = Vec::new();
     let mut temp_scale = BuildUpMatrix::empty();
@@ -342,81 +341,81 @@ where
                     //         None
                     //     };
                     // }
-                    LexItem::Seqres(ser_num, chain_id, num_res, values) => {
-                        seqres_start_linenumber = seqres_start_linenumber.min(linenumber);
-                        if let Some(data) = sequence.get_mut(&chain_id) {
-                            data.push((ser_num, num_res, values));
-                        } else {
-                            sequence.insert(chain_id, vec![(ser_num, num_res, values)]);
-                        }
-                        seqres_lines.push(line);
-                    }
-                    LexItem::Dbref(_pdb_id, chain_id, local_pos, db, db_acc, db_id, db_pos) => {
-                        database_references.push((
-                            chain_id,
-                            DatabaseReference::new(
-                                (db, db_acc, db_id),
-                                SequencePosition::from_tuple(local_pos),
-                                SequencePosition::from_tuple(db_pos),
-                            ),
-                            true,
-                        ));
-                    }
-                    LexItem::Dbref1(_pdb_id, chain_id, local_pos, db, db_id) => {
-                        database_references.push((
-                            chain_id,
-                            DatabaseReference::new(
-                                (db, "".to_string(), db_id),
-                                SequencePosition::from_tuple(local_pos),
-                                SequencePosition::new(0, ' ', 0, ' '),
-                            ),
-                            false,
-                        ));
-                    }
-                    LexItem::Dbref2(_pdb_id, chain_id, db_acc, db_start, db_end) => {
-                        let mut found = false;
-                        for dbref in database_references.iter_mut() {
-                            if dbref.0 == chain_id {
-                                dbref.1.database.acc = db_acc;
-                                dbref.1.database_position =
-                                    SequencePosition::new(db_start, ' ', db_end, ' ');
-                                dbref.2 = true;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if !found {
-                            errors.push(PDBError::new(ErrorLevel::BreakingError, "Solitary DBREF2", format!("Could not find the DBREF1 record fitting to this DBREF2 with chain id '{chain_id}'"), line_context.clone()))
-                        }
-                    }
-                    LexItem::Seqadv(
-                        _id_code,
-                        chain_id,
-                        res_name,
-                        seq_num,
-                        insert,
-                        _database,
-                        _database_accession,
-                        db_pos,
-                        comment,
-                    ) => {
-                        if let Some((_, db_ref, _)) =
-                            database_references.iter_mut().find(|a| a.0 == chain_id)
-                        {
-                            db_ref.differences.push(SequenceDifference::new(
-                                (res_name, seq_num, insert),
-                                db_pos,
-                                comment,
-                            ))
-                        } else {
-                            errors.push(PDBError::new(
-                            ErrorLevel::StrictWarning,
-                            "Sequence Difference Database not found",
-                            format!("For this sequence difference (chain: {chain_id}) the corresponding database definition (DBREF) was not found, make sure the DBREF is located before the SEQADV"),
-                            line_context.clone()
-                        ))
-                        }
-                    }
+                    // LexItem::Seqres(ser_num, chain_id, num_res, values) => {
+                    //     seqres_start_linenumber = seqres_start_linenumber.min(linenumber);
+                    //     if let Some(data) = sequence.get_mut(&chain_id) {
+                    //         data.push((ser_num, num_res, values));
+                    //     } else {
+                    //         sequence.insert(chain_id, vec![(ser_num, num_res, values)]);
+                    //     }
+                    //     seqres_lines.push(line);
+                    // }
+                    // LexItem::Dbref(_pdb_id, chain_id, local_pos, db, db_acc, db_id, db_pos) => {
+                    //     database_references.push((
+                    //         chain_id,
+                    //         DatabaseReference::new(
+                    //             (db, db_acc, db_id),
+                    //             SequencePosition::from_tuple(local_pos),
+                    //             SequencePosition::from_tuple(db_pos),
+                    //         ),
+                    //         true,
+                    //     ));
+                    // }
+                    // LexItem::Dbref1(_pdb_id, chain_id, local_pos, db, db_id) => {
+                    //     database_references.push((
+                    //         chain_id,
+                    //         DatabaseReference::new(
+                    //             (db, "".to_string(), db_id),
+                    //             SequencePosition::from_tuple(local_pos),
+                    //             SequencePosition::new(0, ' ', 0, ' '),
+                    //         ),
+                    //         false,
+                    //     ));
+                    // }
+                    // LexItem::Dbref2(_pdb_id, chain_id, db_acc, db_start, db_end) => {
+                    //     let mut found = false;
+                    //     for dbref in database_references.iter_mut() {
+                    //         if dbref.0 == chain_id {
+                    //             dbref.1.database.acc = db_acc;
+                    //             dbref.1.database_position =
+                    //                 SequencePosition::new(db_start, ' ', db_end, ' ');
+                    //             dbref.2 = true;
+                    //             found = true;
+                    //             break;
+                    //         }
+                    //     }
+                    //     if !found {
+                    //         errors.push(PDBError::new(ErrorLevel::BreakingError, "Solitary DBREF2", format!("Could not find the DBREF1 record fitting to this DBREF2 with chain id '{chain_id}'"), line_context.clone()))
+                    //     }
+                    // }
+                    // LexItem::Seqadv(
+                    //     _id_code,
+                    //     chain_id,
+                    //     res_name,
+                    //     seq_num,
+                    //     insert,
+                    //     _database,
+                    //     _database_accession,
+                    //     db_pos,
+                    //     comment,
+                    // ) => {
+                    //     if let Some((_, db_ref, _)) =
+                    //         database_references.iter_mut().find(|a| a.0 == chain_id)
+                    //     {
+                    //         db_ref.differences.push(SequenceDifference::new(
+                    //             (res_name, seq_num, insert),
+                    //             db_pos,
+                    //             comment,
+                    //         ))
+                    //     } else {
+                    //         errors.push(PDBError::new(
+                    //         ErrorLevel::StrictWarning,
+                    //         "Sequence Difference Database not found",
+                    //         format!("For this sequence difference (chain: {chain_id}) the corresponding database definition (DBREF) was not found, make sure the DBREF is located before the SEQADV"),
+                    //         line_context.clone()
+                    //     ))
+                    //     }
+                    // }
                     item @ LexItem::Modres(..) => modifications.push((line_context.clone(), item)),
                     item @ LexItem::SSBond(..) => bonds.push((line_context.clone(), item)),
                     LexItem::Master(
@@ -534,18 +533,18 @@ where
         pdb.add_model(Model::from_iter(current_model_number, chains.into_iter()));
     }
 
-    for (chain_id, reference, complete) in database_references {
-        if !complete {
-            errors.push(PDBError::new(
-                ErrorLevel::StrictWarning,
-                "Solitary DBREF1 definition",
-                format!("The complementary DBREF2 was not found for this DBREF1 definition. For chain id '{}'. For database '{}' with ID code '{}'.", chain_id, reference.database.name, reference.database.id),
-                Context::None,
-            ))
-        } else if let Some(chain) = pdb.chains_mut().find(|a| a.id() == chain_id) {
-            chain.set_database_reference(reference);
-        }
-    }
+    // for (chain_id, reference, complete) in database_references {
+    //     if !complete {
+    //         errors.push(PDBError::new(
+    //             ErrorLevel::StrictWarning,
+    //             "Solitary DBREF1 definition",
+    //             format!("The complementary DBREF2 was not found for this DBREF1 definition. For chain id '{}'. For database '{}' with ID code '{}'.", chain_id, reference.database.name, reference.database.id),
+    //             Context::None,
+    //         ))
+    //     } else if let Some(chain) = pdb.chains_mut().find(|a| a.id() == chain_id) {
+    //         chain.set_database_reference(reference);
+    //     }
+    // }
 
     if let Some(scale) = temp_scale.get_matrix() {
         pdb.scale = Some(scale);
