@@ -189,14 +189,17 @@ where
                         let atom = if let Some(a) = Atom::new(
                             hetero,
                             serial_number + atom_serial_addition,
-                            id_iter.next().expect("Atom ID iterator is exhausted"),
-                            name,
+                            &id_iter
+                                .next()
+                                .expect("Atom ID iterator is exhausted")
+                                .to_string(),
+                            &name,
                             x,
                             y,
                             z,
                             occ,
                             b,
-                            element,
+                            &element,
                             charge,
                         ) {
                             a

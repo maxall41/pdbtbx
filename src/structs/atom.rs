@@ -48,19 +48,19 @@ impl Atom {
     pub fn new(
         hetero: bool,
         serial_number: usize,
-        id: impl Into<String>,
-        atom_name: impl Into<String>,
+        id: &str,
+        atom_name: &str,
         x: f64,
         y: f64,
         z: f64,
         occupancy: f64,
         b_factor: f64,
-        element: impl Into<String>,
+        element: &str,
         charge: isize,
     ) -> Option<Self> {
-        let id = id.into().trim().to_string();
-        let atom_name = atom_name.into().trim().to_string();
-        let element = element.into().trim().to_string();
+        let id = id.trim();
+        let atom_name = atom_name.trim();
+        let element = element.trim();
         if valid_identifier(&id)
             && valid_identifier(&atom_name)
             && valid_identifier(&element)
@@ -70,9 +70,9 @@ impl Atom {
             && occupancy.is_finite()
             && b_factor.is_finite()
         {
-            let element = if let Ok(elem) = element.as_str().try_into() {
+            let element = if let Ok(elem) = element.try_into() {
                 Some(elem)
-            } else if let Ok(elem) = atom_name.as_str().try_into() {
+            } else if let Ok(elem) = atom_name.try_into() {
                 Some(elem)
             } else if !atom_name.is_empty() {
                 let char = atom_name.trim().chars().next();
@@ -88,7 +88,7 @@ impl Atom {
                 counter: ATOM_COUNTER.fetch_add(1, AtomicOrdering::SeqCst),
                 hetero,
                 serial_number,
-                id,
+                id: id.to_string(),
                 name: atom_name.trim().to_ascii_uppercase(),
                 x,
                 y,

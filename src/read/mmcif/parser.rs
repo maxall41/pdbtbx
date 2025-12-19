@@ -588,14 +588,14 @@ fn parse_atoms(
         if let Some(mut atom) = Atom::new(
             hetero,
             current_model_atom_count, // serial number -> increments in same order as atom definitions in file
-            id,
-            name,
+            &id,
+            &name,
             pos_x,
             pos_y,
             pos_z,
             occupancy,
             b_factor,
-            element,
+            &element,
             charge,
         ) {
             if let Some(matrix) = aniso {
