@@ -21,7 +21,10 @@ pub fn valid_identifier(text: impl AsRef<str>) -> bool {
 /// Also turns the identifier to uppercase.
 pub fn prepare_identifier_uppercase(text: impl AsRef<str>) -> Option<String> {
     let text = text.as_ref();
-    prepare_identifier(text).map(|s| s.to_uppercase())
+    prepare_identifier(text).map(|mut s| {
+        s.make_ascii_uppercase();
+        s
+    })
 }
 
 /// Creates a valid identifier from the given string slice.

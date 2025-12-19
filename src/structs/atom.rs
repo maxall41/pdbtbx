@@ -1,4 +1,5 @@
 #![allow(dead_code)]
+use crate::fast_trim;
 use crate::reference_tables;
 use crate::structs::*;
 use crate::transformation::TransformationMatrix;
@@ -58,9 +59,9 @@ impl Atom {
         element: &str,
         charge: isize,
     ) -> Option<Self> {
-        let id = id.trim();
-        let atom_name = atom_name.trim();
-        let element = element.trim();
+        let id = fast_trim(id);
+        let atom_name = fast_trim(atom_name);
+        let element = fast_trim(element);
         if valid_identifier(&id)
             && valid_identifier(&atom_name)
             && valid_identifier(&element)
@@ -75,8 +76,8 @@ impl Atom {
             } else if let Ok(elem) = atom_name.try_into() {
                 Some(elem)
             } else if !atom_name.is_empty() {
-                let char = atom_name.trim().chars().next();
-                if !atom_name.trim().is_empty() && "CHNOS".contains(char?) {
+                let char = atom_name.chars().next();
+                if !atom_name.is_empty() && "CHNOS".contains(char?) {
                     Element::from_symbol(char?.to_string().as_str())
                 } else {
                     None
@@ -89,7 +90,7 @@ impl Atom {
                 hetero,
                 serial_number,
                 id: id.to_string(),
-                name: atom_name.trim().to_ascii_uppercase(),
+                name: atom_name.to_ascii_uppercase(),
                 x,
                 y,
                 z,

@@ -24,25 +24,6 @@ pub(crate) fn fast_parse_u64_from_string(s: &str) -> Result<u64, String> {
     Ok(result)
 }
 
-/// Trims whitespace from a string, quickly.
-pub(crate) fn fast_trim(s: &str) -> &str {
-    let bytes = s.as_bytes();
-    let mut start = 0;
-    let mut end = bytes.len();
-
-    while start < end {
-        if bytes[start].is_ascii_whitespace() {
-            start += 1;
-        } else if bytes[end - 1].is_ascii_whitespace() {
-            end -= 1;
-        } else {
-            break;
-        }
-    }
-
-    &s[start..end]
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -57,14 +38,5 @@ mod tests {
         assert!(fast_parse_u64_from_string(" ").is_err());
         assert!(fast_parse_u64_from_string("     ").is_err());
         assert!(fast_parse_u64_from_string("").is_err());
-    }
-
-    #[test]
-    fn test_trim() {
-        assert_eq!(fast_trim("   hello   "), "hello");
-        assert_eq!(fast_trim("  world"), "world");
-        assert_eq!(fast_trim("rust"), "rust");
-        assert_eq!(fast_trim("   "), "");
-        assert_eq!(fast_trim(" \t r \r"), "r");
     }
 }

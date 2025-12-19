@@ -3,8 +3,8 @@ use std::{cmp, ops::Range, str::FromStr};
 use context_error::{BoxedError, Context, CreateError};
 
 use super::lexitem::*;
-use super::utils::{fast_parse_u64_from_string, fast_trim};
-use crate::{reference_tables, ErrorLevel, ReadOptions, StrictnessLevel};
+use super::utils::fast_parse_u64_from_string;
+use crate::{fast_trim, reference_tables, ErrorLevel, ReadOptions, StrictnessLevel};
 
 /// Lex a full line. It returns a lexed item with errors if it can lex something, otherwise it will only return an error.
 pub(crate) fn lex_line(
