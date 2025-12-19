@@ -436,24 +436,19 @@ impl<'a> Model {
         conformer_id: (impl AsRef<str>, Option<&str>),
     ) {
         let chain_id = chain_id.as_ref().trim();
-        let mut found = false;
-        let mut new_chain = Chain::new(chain_id).expect("Invalid characters in chain creation");
-        let mut current_chain = &mut new_chain;
-        for chain in &mut self.chains {
-            if chain.id() == chain_id {
-                current_chain = chain;
-                found = true;
-                break;
-            }
-        }
-        #[allow(clippy::unwrap_used)]
-        if !found {
-            // As this moves the chain the atom should be added later to keep the reference intact
-            self.chains.push(new_chain);
-            current_chain = self.chains.last_mut().unwrap();
-        }
 
-        current_chain.add_atom(new_atom, residue_id, conformer_id);
+        let chain_index = self.chains.iter().position(|chain| chain.id() == chain_id);
+
+        let chain_index = match chain_index {
+            Some(index) => index,
+            None => {
+                let new_chain = Chain::new(chain_id).expect("Invalid characters in chain creation");
+                self.chains.push(new_chain);
+                self.chains.len() - 1
+            }
+        };
+
+        self.chains[chain_index].add_atom(new_atom, residue_id, conformer_id);
     }
 
     /// Add a Chain to the list of Chains making up this Model. This does not detect any duplicates of names or serial numbers in the list of Chains.

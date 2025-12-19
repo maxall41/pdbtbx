@@ -4,6 +4,7 @@ use crate::transformation::TransformationMatrix;
 #[cfg(feature = "rayon")]
 use rayon::prelude::*;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::fmt;
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -373,26 +374,28 @@ impl<'a> Residue {
     /// ## Panics
     /// It panics if the Residue name contains any invalid characters.
     pub fn add_atom(&mut self, new_atom: Atom, conformer_id: (impl AsRef<str>, Option<&str>)) {
-        let mut found = false;
         let name = prepare_identifier_uppercase(conformer_id.0).expect("Invalid Conformer ID");
         let conformer_id = (name.as_str(), conformer_id.1);
-        let mut new_conformer = Conformer::new(conformer_id.0, conformer_id.1, None)
-            .expect("Invalid chars in Residue creation");
-        let mut current_conformer = &mut new_conformer;
-        for conformer in &mut self.conformers {
+
+        let mut conformer_index: Option<usize> = None;
+        for (i, conformer) in self.conformers.iter().enumerate() {
             if conformer.id() == conformer_id {
-                current_conformer = conformer;
-                found = true;
+                conformer_index = Some(i);
                 break;
             }
         }
-        #[allow(clippy::unwrap_used)]
-        if !found {
-            self.conformers.push(new_conformer);
-            current_conformer = self.conformers.last_mut().unwrap();
-        }
 
-        current_conformer.add_atom(new_atom);
+        let conformer_index = match conformer_index {
+            Some(index) => index,
+            None => {
+                let new_conformer = Conformer::new(conformer_id.0, conformer_id.1.as_deref(), None)
+                    .expect("Invalid chars in Residue creation");
+                self.conformers.push(new_conformer);
+                self.conformers.len() - 1
+            }
+        };
+
+        self.conformers[conformer_index].add_atom(new_atom);
     }
 
     /// Remove all empty Conformers from this Residue.
